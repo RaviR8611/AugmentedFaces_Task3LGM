@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    android:background="#52EADD">
+
+    <Button
+        android:id="@+id/button_makeup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/makeup"
+        android:textColor="#EC92F3"/>
+
+    <Button
+        android:id="@+id/button_glasses"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/glasses"
+        android:textColor="#4CAF50" />
+
+    <Button
+        android:id="@+id/button_regions"
+        android:layout_width="153dp"
+        android:layout_height="wrap_content"
+        android:text="@string/regions"
+        android:textColor="#FF5722" />
+
+    <Button
+        android:id="@+id/button_face_landmarks"
+        android:layout_width="154dp"
+        android:layout_height="wrap_content"
+        android:text="@string/face_landmarks"
+        android:textColor="#FAF593" />
+</LinearLayout>
