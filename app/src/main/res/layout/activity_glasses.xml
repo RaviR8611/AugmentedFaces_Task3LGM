@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".GlassesActivity">
 
-    <fragment android:name="no.chavan.task3LGM.FaceArFragment"
+    <fragment android:name="no.ravirathod.LGMtask3.FaceArFragment"
         android:id="@+id/face_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

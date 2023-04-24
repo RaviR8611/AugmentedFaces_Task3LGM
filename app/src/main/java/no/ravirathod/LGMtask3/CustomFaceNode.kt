@@ -1,4 +1,4 @@
-package no.chavan.task3LGM
+package no.ravirathod.LGMtask3
 
 import android.content.Context
 import android.widget.ImageView

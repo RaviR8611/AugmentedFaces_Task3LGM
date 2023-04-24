@@ -1,24 +1,26 @@
-package no.chavan.task3LGM
+package no.ravirathod.LGMtask3
 
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.core.ArCoreApk
 import com.google.ar.core.AugmentedFace
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.rendering.Renderable
-import kotlinx.android.synthetic.main.activity_regions.*
+import com.google.ar.sceneform.rendering.Texture
+import com.google.ar.sceneform.ux.AugmentedFaceNode
+import kotlinx.android.synthetic.main.activity_makeup.*
 
-class FaceLandmarksActivity : AppCompatActivity() {
+class MakeupActivity : AppCompatActivity() {
     companion object {
         const val MIN_OPENGL_VERSION = 3.0
     }
 
     lateinit var arFragment: FaceArFragment
-    var faceNodeMap = HashMap<AugmentedFace, CustomFaceNode>()
+    private var faceMeshTexture: Texture? = null
+    var faceNodeMap = HashMap<AugmentedFace, AugmentedFaceNode>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,41 +28,46 @@ class FaceLandmarksActivity : AppCompatActivity() {
             return
         }
 
-        setContentView(R.layout.activity_regions)
+        setContentView(R.layout.activity_makeup)
         arFragment = face_fragment as FaceArFragment
-
-        button_refresh.visibility = View.GONE
+        Texture.builder()
+            .setSource(this, R.drawable.makeup)
+            .build()
+            .thenAccept { texture -> faceMeshTexture = texture }
 
         val sceneView = arFragment.arSceneView
         sceneView.cameraStreamRenderPriority = Renderable.RENDER_PRIORITY_FIRST
         val scene = sceneView.scene
 
         scene.addOnUpdateListener {
-            sceneView.session
-                ?.getAllTrackables(AugmentedFace::class.java)?.let {
-                    for (f in it) {
-                        if (!faceNodeMap.containsKey(f)) {
-                            val faceNode = CustomFaceNode(f, this)
-                            faceNode.setParent(scene)
-                            faceNodeMap.put(f, faceNode)
+            faceMeshTexture.let {
+                sceneView.session
+                    ?.getAllTrackables(AugmentedFace::class.java)?.let {
+                        for (f in it) {
+                            if (!faceNodeMap.containsKey(f)) {
+                                val faceNode = AugmentedFaceNode(f)
+                                faceNode.setParent(scene)
+                                faceNode.faceMeshTexture = faceMeshTexture
+                                faceNodeMap.put(f, faceNode)
+                            }
+                        }
+                        // Remove any AugmentedFaceNodes associated with an AugmentedFace that stopped tracking.
+                        val iter = faceNodeMap.entries.iterator()
+                        while (iter.hasNext()) {
+                            val entry = iter.next()
+                            val face = entry.key
+                            if (face.trackingState == TrackingState.STOPPED) {
+                                val faceNode = entry.value
+                                faceNode.setParent(null)
+                                iter.remove()
+                            }
                         }
                     }
-                    // Remove any AugmentedFaceNodes associated with an AugmentedFace that stopped tracking.
-                    val iter = faceNodeMap.entries.iterator()
-                    while (iter.hasNext()) {
-                        val entry = iter.next()
-                        val face = entry.key
-                        if (face.trackingState == TrackingState.STOPPED) {
-                            val faceNode = entry.value
-                            faceNode.setParent(null)
-                            iter.remove()
-                        }
-                    }
-                }
+            }
         }
     }
 
-    private fun checkIsSupportedDeviceOrFinish() : Boolean {
+    fun checkIsSupportedDeviceOrFinish() : Boolean {
         if (ArCoreApk.getInstance().checkAvailability(this) == ArCoreApk.Availability.UNSUPPORTED_DEVICE_NOT_CAPABLE) {
             Toast.makeText(this, "Augmented Faces requires ARCore", Toast.LENGTH_LONG).show()
             finish()
